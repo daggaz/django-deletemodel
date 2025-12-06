@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=constraintbug
+      - POSTGRES_USER=constraintbug
+      - POSTGRES_DB=constraintbug
+    healthcheck:
+      test: pg_isready -U constraintbug -d constraintbug
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: .
+    volumes:
+      - ./src:/app
+    command:
+      - migrate
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
